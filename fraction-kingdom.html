@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraction Kingdom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B1B3A;
+  --night:#191A3D;
+  --night2:#232759;
+  --panel:#2C2F6B;
+  --panel-light:#3A3E86;
+  --cream:#FFF7E8;
+  --gold:#F4B740;
+  --gold-dark:#D99A1E;
+  --coral:#FF6B5B;
+  --mint:#3FCFAF;
+  --sky:#5FC7E8;
+  --violet:#9B7BE0;
+  --line:rgba(255,255,255,0.12);
+  --radius:18px;
+  font-family:'Nunito',sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:radial-gradient(ellipse at top, #2A2E68 0%, #14152E 65%);
+  color:var(--cream);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Baloo 2',cursive;}
+.app{max-width:900px;margin:0 auto;padding:18px 16px 60px;}
+.hidden{display:none !important;}
+button{font-family:'Nunito',sans-serif;cursor:pointer;border:none;}
+.btn{
+  background:var(--gold);
+  color:#3A2400;
+  font-weight:800;
+  padding:13px 22px;
+  border-radius:14px;
+  font-size:16px;
+  box-shadow:0 4px 0 var(--gold-dark);
+  transition:transform .08s;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gold-dark);}
+.btn.secondary{background:var(--panel-light);color:var(--cream);box-shadow:0 4px 0 #24275A;}
+.btn.secondary:active{box-shadow:0 1px 0 #24275A;}
+.btn.ghost{background:transparent;color:var(--cream);box-shadow:none;border:2px solid var(--line);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn.small{padding:8px 14px;font-size:13px;border-radius:10px;}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.center{display:flex;align-items:center;justify-content:center;}
+.spread{display:flex;justify-content:space-between;align-items:center;}
+
+/* ---- Login ---- */
+.login-card{
+  background:var(--panel);
+  border-radius:24px;
+  padding:34px 26px;
+  margin-top:40px;
+  box-shadow:0 12px 0 rgba(0,0,0,.25);
+  border:1px solid var(--line);
+}
+.login-title{font-size:34px;margin:0 0 4px;color:var(--gold);text-align:center;}
+.login-sub{text-align:center;opacity:.75;margin:0 0 24px;font-size:15px;}
+label{font-weight:700;font-size:13px;opacity:.85;display:block;margin:14px 0 6px;}
+input[type=text],select{
+  width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--line);
+  background:var(--night2);color:var(--cream);font-size:15px;font-family:'Nunito',sans-serif;
+}
+input[type=text]:focus,select:focus{outline:2px solid var(--gold);}
+.avatar-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+.avatar-opt{font-size:26px;background:var(--night2);border:2px solid var(--line);border-radius:14px;width:54px;height:54px;display:flex;align-items:center;justify-content:center;}
+.avatar-opt.sel{border-color:var(--gold);background:#3A2F0F;}
+
+/* ---- Header / HUD ---- */
+.hud{background:var(--panel);border-radius:18px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--line);}
+.hud-top{display:flex;align-items:center;gap:12px;}
+.avatar-badge{font-size:26px;background:var(--night2);border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hud-name{font-weight:800;font-size:15px;}
+.hud-sec{opacity:.65;font-size:12px;}
+.hud-stats{margin-left:auto;display:flex;gap:14px;font-weight:800;font-size:13px;}
+.stat-pill{background:var(--night2);padding:6px 11px;border-radius:20px;display:flex;gap:5px;align-items:center;}
+
+/* ---- World map ---- */
+.map-title{text-align:center;margin:6px 0 18px;}
+.map-title h1{color:var(--gold);font-size:26px;margin:0;}
+.map-title p{opacity:.7;margin:4px 0 0;font-size:13px;}
+.trail{position:relative;padding:10px 4px 4px;}
+.node-row{display:flex;justify-content:center;margin-bottom:2px;}
+.node{
+  width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:14px 16px;margin:6px auto;display:flex;align-items:center;gap:14px;position:relative;
+}
+.node.locked{opacity:.45;}
+.node .num{
+  width:44px;height:44px;border-radius:12px;background:var(--night2);display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2';font-weight:800;font-size:18px;flex-shrink:0;
+}
+.node.done .num{background:var(--mint);color:#04261E;}
+.node.boss .num{background:var(--coral);color:#3A0700;}
+.node-body{flex:1;min-width:0;}
+.node-body h3{margin:0 0 2px;font-size:15px;}
+.node-body p{margin:0;font-size:12px;opacity:.7;}
+.node-stars{display:flex;gap:2px;font-size:14px;flex-shrink:0;}
+.node .play-btn{flex-shrink:0;}
+
+/* ---- Gameplay ---- */
+.game-card{background:var(--panel);border-radius:20px;padding:22px;border:1px solid var(--line);}
+.progress-track{height:8px;background:var(--night2);border-radius:6px;overflow:hidden;margin-bottom:16px;}
+.progress-fill{height:100%;background:var(--mint);transition:width .3s;}
+.q-topline{display:flex;justify-content:space-between;font-size:12px;opacity:.7;margin-bottom:6px;}
+.q-visual{background:var(--night2);border-radius:14px;padding:16px;margin:14px 0;display:flex;justify-content:center;}
+.q-text{font-family:'Baloo 2';font-size:21px;text-align:center;margin:6px 0 18px;line-height:1.45;}
+.q-text .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;font-size:.85em;line-height:1;}
+.q-text .frac span{display:block;padding:0 4px;}
+.q-text .frac .num-l{border-bottom:2px solid var(--cream);padding-bottom:2px;}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.choice-btn{
+  background:var(--night2);border:2px solid var(--line);border-radius:14px;padding:16px 10px;
+  font-family:'Baloo 2';font-size:18px;color:var(--cream);text-align:center;
+}
+.choice-btn:hover{border-color:var(--gold);}
+.choice-btn.correct{background:var(--mint);color:#04261E;border-color:var(--mint);}
+.choice-btn.wrong{background:var(--coral);color:#3A0700;border-color:var(--coral);}
+.choice-btn.dimmed{opacity:.25;pointer-events:none;}
+.powerup-bar{display:flex;gap:10px;justify-content:center;margin-top:18px;}
+.pw-btn{background:var(--night2);border:2px solid var(--line);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--cream);}
+.pw-btn .n{font-size:16px;}
+.pw-btn:disabled{opacity:.3;}
+.hint-box{background:#20264F;border:1px dashed var(--gold);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:13.5px;line-height:1.5;}
+.feedback-box{margin-top:16px;border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.55;}
+.feedback-box.ok{background:rgba(63,207,175,.15);border:1px solid var(--mint);}
+.feedback-box.no{background:rgba(255,107,91,.15);border:1px solid var(--coral);}
+.timer-wrap{height:6px;background:var(--night2);border-radius:4px;overflow:hidden;margin-bottom:12px;}
+.timer-fill{height:100%;background:var(--coral);width:100%;}
+
+/* ---- Level complete ---- */
+.complete-card{background:var(--panel);border-radius:22px;padding:30px 24px;text-align:center;border:1px solid var(--line);}
+.stars-big{font-size:42px;margin:8px 0 4px;letter-spacing:6px;}
+.badge-pop{background:var(--night2);border-radius:16px;padding:14px;margin:16px 0;display:flex;align-items:center;gap:12px;text-align:left;}
+.badge-pop .ic{font-size:30px;}
+.report-panel{background:var(--night2);border-radius:14px;padding:16px;text-align:left;margin-top:18px;font-size:13px;}
+.report-panel table{width:100%;border-collapse:collapse;margin-top:8px;}
+.report-panel td{padding:4px 0;border-bottom:1px solid var(--line);}
+.report-panel td:last-child{text-align:right;font-weight:700;}
+
+/* ---- Multiplayer ---- */
+.tab-row{display:flex;gap:8px;margin-bottom:16px;}
+.tab-btn{flex:1;background:var(--night2);padding:10px;border-radius:12px;font-weight:800;color:var(--cream);opacity:.6;}
+.tab-btn.active{opacity:1;background:var(--panel-light);}
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--night2);border-radius:12px;margin-bottom:8px;}
+.lb-rank{font-family:'Baloo 2';font-weight:800;width:22px;}
+.lb-name{flex:1;font-weight:700;}
+.lb-score{font-weight:800;color:var(--gold);}
+.boss-hp-wrap{height:26px;background:var(--night2);border-radius:14px;overflow:hidden;margin:14px 0;border:2px solid var(--coral);}
+.boss-hp-fill{height:100%;background:linear-gradient(90deg,var(--coral),#FF9B44);transition:width .4s;}
+
+.footer-note{text-align:center;opacity:.4;font-size:11px;margin-top:30px;}
+@media(max-width:520px){.choices{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- LOGIN -->
+  <div id="screen-login">
+    <div class="login-card">
+      <h1 class="login-title">🏰 Fraction Kingdom</h1>
+      <p class="login-sub">A 14-quest adventure through the world of fractions — Prathom 5</p>
+      <label>Your name</label>
+      <input type="text" id="in-name" placeholder="e.g. Nong Ploy" maxlength="24">
+      <label>Class section</label>
+      <select id="in-section">
+        <option>P5/1</option><option>P5/2</option><option>P5/3</option><option>P5/4</option><option>Other</option>
+      </select>
+      <label>Pick your avatar</label>
+      <div class="avatar-grid" id="avatar-grid"></div>
+      <label>Teacher's email (for progress reports)</label>
+      <input type="text" id="in-teacher" placeholder="teacher@school.ac.th">
+      <div class="center" style="margin-top:26px;">
+        <button class="btn" id="btn-start">Begin the Quest ⚔️</button>
+      </div>
+      <p class="footer-note" style="margin-top:18px;">Saves your progress on this device/account automatically.</p>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="screen-map" class="hidden">
+    <div class="hud">
+      <div class="hud-top">
+        <div class="avatar-badge" id="hud-avatar"></div>
+        <div>
+          <div class="hud-name" id="hud-name"></div>
+          <div class="hud-sec" id="hud-sec"></div>
+        </div>
+        <div class="hud-stats">
+          <div class="stat-pill">⭐ <span id="hud-xp">0</span></div>
+          <div class="stat-pill">🪙 <span id="hud-coins">0</span></div>
+          <div class="stat-pill">🎖️ <span id="hud-badges">0</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:14px;">
+      <button class="btn secondary small" id="btn-mp">🎮 Play with Friends</button>
+      <button class="btn ghost small" id="btn-badges">🎖️ My Badges</button>
+      <button class="btn ghost small" id="btn-teacher-panel">📧 Teacher Report</button>
+    </div>
+    <div class="map-title">
+      <h1>World Map</h1>
+      <p>14 quests · complete each to unlock the next</p>
+    </div>
+    <div class="trail" id="trail"></div>
+  </div>
+
+  <!-- GAMEPLAY -->
+  <div id="screen-game" class="hidden">
+    <div class="row spread" style="margin-bottom:10px;">
+      <button class="btn ghost small" id="btn-quit">← Map</button>
+      <div class="row" id="game-powerup-mini"></div>
+    </div>
+    <div class="game-card">
+      <div id="timer-wrap" class="timer-wrap hidden"><div class="timer-fill" id="timer-fill"></div></div>
+      <div class="q-topline">
+        <span id="q-level-name">Level</span>
+        <span id="q-progress-text">Q 1/8</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div id="q-visual" class="q-visual hidden"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="choices" id="q-choices"></div>
+      <div id="hint-box" class="hint-box hidden"></div>
+      <div id="feedback-box" class="feedback-box hidden"></div>
+      <div class="powerup-bar">
+        <button class="pw-btn" id="pw-fifty">❄️❌<span class="n" id="pw-fifty-n">0</span><span>50/50</span></button>
+        <button class="pw-btn" id="pw-hint">💡<span class="n" id="pw-hint-n">0</span><span>Hint Radar</span></button>
+        <button class="pw-btn" id="pw-freeze">⏱️<span class="n" id="pw-freeze-n">0</span><span>Time Freeze</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL COMPLETE -->
+  <div id="screen-complete" class="hidden">
+    <div class="complete-card">
+      <h1 id="cc-title" style="color:var(--gold);">Quest Complete!</h1>
+      <div class="stars-big" id="cc-stars">⭐⭐⭐</div>
+      <p id="cc-summary" style="opacity:.85;"></p>
+      <div id="cc-badge" class="badge-pop hidden"></div>
+      <div class="report-panel" id="cc-report"></div>
+      <div class="row center" style="margin-top:20px;">
+        <button class="btn secondary small" id="btn-send-report">📧 Email report to teacher</button>
+        <button class="btn ghost small" id="btn-download-report">⬇️ Download CSV</button>
+      </div>
+      <div class="center" style="margin-top:22px;">
+        <button class="btn" id="btn-cc-continue">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTIPLAYER -->
+  <div id="screen-mp" class="hidden">
+    <div class="row spread" style="margin-bottom:14px;">
+      <button class="btn ghost small" id="btn-mp-back">← Map</button>
+      <h2 style="margin:0;color:var(--gold);">Play with Friends</h2>
+      <span></span>
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-arena">⚡ Speed Arena</button>
+      <button class="tab-btn" id="tab-boss">🐉 Class Boss Battle</button>
+    </div>
+    <div class="game-card">
+      <div id="mp-setup">
+        <label>Room code (share with classmates — ask your teacher for one, or make one)</label>
+        <div class="row">
+          <input type="text" id="in-room" placeholder="e.g. P5-1-FRAC" style="flex:1;">
+          <button class="btn small" id="btn-mp-make">Generate</button>
+        </div>
+        <label style="margin-top:16px;">Quest to play</label>
+        <select id="mp-level-select"></select>
+        <div class="center" style="margin-top:22px;">
+          <button class="btn" id="btn-mp-join">Join Room</button>
+        </div>
+      </div>
+      <div id="mp-live" class="hidden">
+        <div id="mp-arena-panel">
+          <p style="opacity:.7;font-size:13px;">Room <b id="mp-room-label"></b> · answer fast, the live board updates as everyone plays.</p>
+          <div id="mp-leaderboard"></div>
+        </div>
+        <div id="mp-boss-panel" class="hidden">
+          <p style="opacity:.7;font-size:13px;">Room <b id="mp-room-label2"></b> · every correct answer from the whole class damages the dragon!</p>
+          <div class="boss-hp-wrap"><div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div></div>
+          <p class="center" style="font-family:'Baloo 2';font-size:15px;" id="boss-hp-text">HP 100/100</p>
+          <div id="boss-contrib"></div>
+        </div>
+        <div class="center" style="margin-top:16px;">
+          <button class="btn" id="btn-mp-play">▶️ Answer Questions</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div id="screen-badges" class="hidden">
+    <div class="row spread" style="margin-bottom:14px;">
+      <button class="btn ghost small" id="btn-badges-back">← Map</button>
+      <h2 style="margin:0;color:var(--gold);">My Badges</h2><span></span>
+    </div>
+    <div id="badges-grid" class="game-card"></div>
+  </div>
+
+  <p class="footer-note">Fraction Kingdom · Grade 5 fractions unit · not affiliated with any exam board</p>
+</div>
+
+<script>
+/* ============================= FRACTION MATH ============================= */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a||1;}
+function lcm(a,b){return Math.abs(a*b)/gcd(a,b);}
+function simplify(f){const g=gcd(f.n,f.d);let n=f.n/g,d=f.d/g;if(d<0){d*=-1;n*=-1;}return {n,d};}
+function addF(a,b){return simplify({n:a.n*b.d+b.n*a.d,d:a.d*b.d});}
+function subF(a,b){return simplify({n:a.n*b.d-b.n*a.d,d:a.d*b.d});}
+function mulF(a,b){return simplify({n:a.n*b.n,d:a.d*b.d});}
+function divF(a,b){return simplify({n:a.n*b.d,d:a.d*b.n});}
+function eqF(a,b){return a.n*b.d===b.n*a.d;}
+function cmpF(a,b){return a.n*b.d-b.n*a.d;}
+function toImproper(w,n,d){return {n:w*d+n,d};}
+function toMixedParts(f){const w=Math.floor(f.n/f.d);const rem=f.n-w*f.d;return {w,n:rem,d:f.d};}
+function fracHTML(n,d){return `<span class="frac"><span class="num-l">${n}</span><span>${d}</span></span>`;}
+function fracStrForMixed(f){
+  const s=simplify(f);
+  if(s.d===1) return `${s.n}`;
+  if(s.n<0) return fracHTML(s.n,s.d);
+  if(s.n>s.d){const m=toMixedParts(s); return m.n===0? `${m.w}` : `${m.w}${fracHTML(m.n,m.d)}`;}
+  return fracHTML(s.n,s.d);
+}
+function fracPlain(f){const s=simplify(f);return s.d===1?`${s.n}`:`${s.n}/${s.d}`;}
+function ri(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function keyOf(f){return `${simplify(f).n}/${simplify(f).d}`;}
+
+/* Generic distractor generator for fraction-answer questions */
+function fracDistractors(correct,count){
+  const c=simplify(correct);
+  const cands=[];
+  // unsimplified version
+  cands.push({n:c.n*2,d:c.d*2});
+  // flipped
+  if(c.n!==0) cands.push({n:c.d,d:c.n});
+  // off by one numerator
+  cands.push({n:c.n+1,d:c.d});
+  cands.push({n:Math.max(1,c.n-1),d:c.d});
+  // off by one denominator
+  cands.push({n:c.n,d:c.d+1});
+  cands.push({n:c.n,d:Math.max(1,c.d-1)});
+  // swapped mixed
+  cands.push({n:c.n+c.d,d:c.d});
+  const out=[]; const seen=new Set([keyOf(c)]);
+  for(const cand of shuffle(cands)){
+    if(cand.d===0) continue;
+    const s=simplify(cand);
+    const k=keyOf(s);
+    if(!seen.has(k)){ seen.add(k); out.push(s); }
+    if(out.length>=count) break;
+  }
+  while(out.length<count){
+    const s=simplify({n:c.n+ri(1,3),d:c.d+ri(1,3)});
+    const k=keyOf(s);
+    if(!seen.has(k)){seen.add(k);out.push(s);}
+  }
+  return out.slice(0,count);
+}
+function buildMCQ(correctFrac,count=4){
+  const distractors=fracDistractors(correctFrac,count-1);
+  const opts=shuffle([{val:correctFrac,correct:true},...distractors.map(d=>({val:d,correct:false}))]);
+  return opts;
+}
+
+/* ============================= 14 LEVEL DEFINITIONS ============================= */
+const LEVELS=[
+{id:1,title:"Understanding Fractions",icon:"🧩",color:"var(--sky)",gen:genL1},
+{id:2,title:"Comparing & Ordering",icon:"⚖️",color:"var(--violet)",gen:genL2},
+{id:3,title:"Adding (Like Denominators)",icon:"➕",color:"var(--mint)",gen:genL3},
+{id:4,title:"Adding (Unlike Denominators)",icon:"➕",color:"var(--mint)",gen:genL4},
+{id:5,title:"Subtracting Fractions",icon:"➖",color:"var(--coral)",gen:genL5},
+{id:6,title:"Add & Subtract Mixed Numbers",icon:"🔢",color:"var(--gold)",gen:genL6},
+{id:7,title:"Multiply Fraction × Whole",icon:"✖️",color:"var(--sky)",gen:genL7},
+{id:8,title:"Multiply Fraction × Fraction",icon:"✖️",color:"var(--sky)",gen:genL8},
+{id:9,title:"Dividing — Keep, Change, Flip",icon:"🔄",color:"var(--violet)",gen:genL9},
+{id:10,title:"Dividing Fraction ÷ Fraction",icon:"🔄",color:"var(--violet)",gen:genL10},
+{id:11,title:"Combined Operations (BODMAS)",icon:"🧮",color:"var(--gold)",gen:genL11},
+{id:12,title:"Two-Step Word Problems",icon:"📖",color:"var(--mint)",gen:genL12},
+{id:13,title:"Review & Consolidation",icon:"🔁",color:"var(--sky)",gen:genL13},
+{id:14,title:"Final Boss: The Fraction Dragon",icon:"🐉",color:"var(--coral)",gen:genL14,boss:true},
+];
+const QUESTIONS_PER_LEVEL=8, QUESTIONS_PER_BOSS=10;
+
+function genL1(){
+  const t=pick(['identify','classify','numberline']);
+  if(t==='identify'){
+    const d=ri(3,8), n=ri(1,d-1);
+    const segs=Array.from({length:d},(_,i)=>i<n);
+    const visual=`<svg width="260" height="60"><g>`+segs.map((s,i)=>`<rect x="${i*(240/d)+5}" y="10" width="${240/d-3}" height="40" fill="${s?'var(--mint)':'#20264F'}" stroke="#fff" stroke-opacity=".3"/>`).join('')+`</g></svg>`;
+    const correct={n,d};
+    return {visualHTML:visual,text:"What fraction of the bar is shaded?",mcq:buildMCQ(correct),hint:`Count shaded parts (numerator) over total equal parts (denominator): ${n} shaded out of ${d} total parts → <b>${n}/${d}</b>.`};
+  }
+  if(t==='classify'){
+    const d=ri(2,9); let n=ri(1,12);
+    if(n===d) n=d+1;
+    const answer=n<d?'Proper fraction':'Improper fraction';
+    const opts=shuffle(['Proper fraction','Improper fraction']);
+    return {text:`Is ${fracStrForMixed({n,d})} a <b>proper</b> or <b>improper</b> fraction?`,textChoices:opts,correctText:answer,hint:`A fraction is <b>proper</b> when the numerator is smaller than the denominator (value less than 1), and <b>improper</b> when the numerator is equal to or bigger than the denominator (value 1 or more). Here: ${n} ${n<d?'<':'≥'} ${d}.`};
+  }
+  // numberline
+  const marks=[{v:0,l:'0'},{v:0.25,l:'1/4'},{v:0.5,l:'1/2'},{v:0.75,l:'3/4'},{v:1,l:'1'}];
+  const target=pick(marks);
+  const others=shuffle(marks.filter(m=>m!==target)).slice(0,3);
+  const opts=shuffle([target,...others]);
+  return {text:`Which point on the number line (0 to 1) sits at <b>${target.l}</b>?`,
+    visualHTML:`<svg width="280" height="50"><line x1="10" y1="25" x2="270" y2="25" stroke="#fff" stroke-opacity=".4"/>${marks.map(m=>`<circle cx="${10+m.v*260}" cy="25" r="5" fill="var(--gold)"/>`).join('')}</svg>`,
+    textChoices:opts.map(o=>o.l),correctText:target.l,
+    hint:`Benchmark fractions on a 0–1 line: 0, ¼ (quarter way), ½ (halfway), ¾ (three-quarters), and 1 (the end). ${target.l} sits ${target.v*100}% of the way along.`};
+}
+function genL2(){
+  let d1=ri(2,9), d2=ri(2,9); if(d1===d2) d2=d1+2;
+  const n1=ri(1,d1-1), n2=ri(1,d2-1);
+  const f1={n:n1,d:d1}, f2={n:n2,d:d2};
+  const cmp=cmpF(f1,f2);
+  const answer= cmp>0?'>':cmp<0?'<':'=';
+  const lcd=lcm(d1,d2);
+  const e1=n1*(lcd/d1), e2=n2*(lcd/d2);
+  return {text:`Compare: ${fracStrForMixed(f1)} <span style="opacity:.5">___</span> ${fracStrForMixed(f2)}`,
+    textChoices:['<','>','='],correctText:answer,
+    hint:`Find the LCD of ${d1} and ${d2}, which is ${lcd}. Rewrite: ${n1}/${d1} = ${e1}/${lcd}, and ${n2}/${d2} = ${e2}/${lcd}. Now compare the numerators: ${e1} ${answer} ${e2}, so ${fracPlain(f1)} ${answer} ${fracPlain(f2)}.`};
+}
+function genL3(){
+  const d=ri(4,12); const a=ri(1,d-1); let b=ri(1,d-1);
+  const f1={n:a,d}, f2={n:b,d};
+  const sum=addF(f1,f2);
+  return {text:`${fracStrForMixed(f1)} + ${fracStrForMixed(f2)} = ?`,mcq:buildMCQ(sum),
+    hint:`Same denominator, so just add the numerators: ${a} + ${b} = ${a+b}, over ${d} → ${a+b}/${d}${a+b>d?`. Since ${a+b} ≥ ${d}, convert to a mixed number: `+fracPlain(sum):''}${(gcd(a+b,d)>1&&a+b<d)?`, then simplify by dividing both by ${gcd(a+b,d)} → ${fracPlain(sum)}`:''}. Final answer: <b>${fracPlain(sum)}</b>.`};
+}
+function genL4(){
+  let d1=ri(2,9), d2=ri(2,9); if(d1===d2) d2+=2;
+  const n1=ri(1,d1-1), n2=ri(1,d2-1);
+  const f1={n:n1,d:d1}, f2={n:n2,d:d2};
+  const lcd=lcm(d1,d2);
+  const e1=n1*(lcd/d1), e2=n2*(lcd/d2);
+  const sum=addF(f1,f2);
+  return {text:`${fracStrForMixed(f1)} + ${fracStrForMixed(f2)} = ?`,mcq:buildMCQ(sum),
+    hint:`Step 1: LCD of ${d1} & ${d2} = ${lcd}. Step 2: rewrite as equivalent fractions: ${e1}/${lcd} and ${e2}/${lcd}. Step 3: add numerators: ${e1}+${e2}=${e1+e2} → ${e1+e2}/${lcd}. Step 4: simplify → <b>${fracPlain(sum)}</b>.`};
+}
+function genL5(){
+  let d1=ri(2,9), d2=ri(2,9);
+  const useLike=Math.random()<0.4;
+  if(useLike) d2=d1;
+  let n1=ri(2,d1), n2=ri(1,d2-1);
+  let f1={n:n1,d:d1}, f2={n:n2,d:d2};
+  if(cmpF(f1,f2)<0){[f1,f2]=[f2,f1];[d1,d2]=[d2,d1];}
+  const lcd=lcm(f1.d,f2.d);
+  const diff=subF(f1,f2);
+  return {text:`${fracStrForMixed(f1)} − ${fracStrForMixed(f2)} = ?`,mcq:buildMCQ(diff),
+    hint: useLike? `Same denominator: subtract numerators directly: ${f1.n} − ${f2.n} = ${f1.n-f2.n}, over ${d1} → simplify → <b>${fracPlain(diff)}</b>.`
+      : `Different denominators — find LCD (${lcd}), rewrite both fractions over ${lcd}, then subtract numerators and simplify → <b>${fracPlain(diff)}</b>. Check with inverse: ${fracPlain(diff)} + ${fracStrForMixed(f2).replace(/<[^>]+>/g,'')} should equal ${fracStrForMixed(f1).replace(/<[^>]+>/g,'')}.`};
+}
+function genL6(){
+  const op=pick(['add','sub']);
+  const d=ri(3,8);
+  let w1=ri(1,5), n1=ri(1,d-1), w2=ri(1,5), n2=ri(1,d-1);
+  const f1=toImproper(w1,n1,d), f2=toImproper(w2,n2,d);
+  let result, a=f1,b=f2;
+  if(op==='sub' && cmpF(f1,f2)<0){[a,b]=[f2,f1];[w1,n1,w2,n2]=[w2,n2,w1,n1];}
+  result = op==='add'? addF(a,b) : subF(a,b);
+  const needsRegroup = op==='add' ? (n1+n2>=d) : (n1<n2);
+  return {text:`${w1}${fracHTML(n1,d)} ${op==='add'?'+':'−'} ${w2}${fracHTML(n2,d)} = ?`,mcq:buildMCQ(result),
+    hint: op==='add'
+      ? `Add whole numbers: ${w1}+${w2}=${w1+w2}. Add fraction parts: ${n1}/${d}+${n2}/${d}=${n1+n2}/${d}.${needsRegroup?` Since ${n1+n2}≥${d}, regroup: carry 1 to the whole number.`:''} Simplify → <b>${fracPlain(result)}</b>.`
+      : `Subtract fraction parts: ${n1}/${d} − ${n2}/${d}.${needsRegroup?` Since ${n1}<${n2}, borrow 1 whole (=${d}/${d}) from the whole number first, making it ${n1+d}/${d} − ${n2}/${d}.`:''} Then subtract whole numbers. Simplify → <b>${fracPlain(result)}</b>.`};
+}
+function genL7(){
+  const n=ri(2,9); const d=ri(2,10); const a=ri(1,d-1);
+  const f={n:a,d};
+  const result=mulF({n:n,d:1},f);
+  return {text:`${n} × ${fracStrForMixed(f)} = ?`,mcq:buildMCQ(result),
+    hint:`Multiply the whole number by the numerator: ${n} × ${a} = ${n*a}, keep the same denominator → ${n*a}/${d}. Think of it as repeated addition: ${fracPlain(f)} added ${n} times. Simplify → <b>${fracPlain(result)}</b>.`};
+}
+function genL8(){
+  const d1=ri(2,9), d2=ri(2,9), n1=ri(1,d1-1), n2=ri(1,d2-1);
+  const f1={n:n1,d:d1}, f2={n:n2,d:d2};
+  const result=mulF(f1,f2);
+  return {text:`${fracStrForMixed(f1)} × ${fracStrForMixed(f2)} = ?`,mcq:buildMCQ(result),
+    hint:`Multiply numerators straight across: ${n1}×${n2}=${n1*n2}. Multiply denominators: ${d1}×${d2}=${d1*d2}. Result: ${n1*n2}/${d1*d2}. Simplify (divide by GCF) → <b>${fracPlain(result)}</b>.`};
+}
+function genL9(){
+  const asFracDivWhole=Math.random()<0.5;
+  if(asFracDivWhole){
+    const d=ri(2,9), n=ri(1,d-1), w=ri(2,6);
+    const f={n,d};
+    const result=divF(f,{n:w,d:1});
+    return {text:`${fracStrForMixed(f)} ÷ ${w} = ?`,mcq:buildMCQ(result),
+      hint:`Keep the first fraction (${fracPlain(f)}), Change ÷ to ×, Flip the whole number to its reciprocal (${w} → 1/${w}). Now multiply: ${n}/${d} × 1/${w} = ${n}/${d*w}. Simplify → <b>${fracPlain(result)}</b>.`};
+  } else {
+    const d=ri(2,9), n=ri(1,d-1), w=ri(2,6);
+    const f={n,d};
+    const result=divF({n:w,d:1},f);
+    return {text:`${w} ÷ ${fracStrForMixed(f)} = ?`,mcq:buildMCQ(result),
+      hint:`Keep ${w}, Change ÷ to ×, Flip ${fracPlain(f)} to its reciprocal ${d}/${n}. Now: ${w} × ${d}/${n} = ${w*d}/${n}. Simplify → <b>${fracPlain(result)}</b>.`};
+  }
+}
+function genL10(){
+  const useMixed=Math.random()<0.5;
+  if(!useMixed){
+    const d1=ri(2,9), d2=ri(2,9), n1=ri(1,d1-1), n2=ri(1,d2-1);
+    const f1={n:n1,d:d1}, f2={n:n2,d:d2};
+    const result=divF(f1,f2);
+    return {text:`${fracStrForMixed(f1)} ÷ ${fracStrForMixed(f2)} = ?`,mcq:buildMCQ(result),
+      hint:`Keep ${fracPlain(f1)}, Change ÷ to ×, Flip ${fracPlain(f2)} to ${n2>0?`${d2}/${n2}`:''}. Multiply: ${n1}/${d1} × ${d2}/${n2} = ${n1*d2}/${d1*n2}. Simplify → <b>${fracPlain(result)}</b>.`};
+  } else {
+    const d=ri(2,6), w1=ri(1,3), n1=ri(1,d-1), w2=ri(1,3), n2=ri(1,d-1);
+    const f1=toImproper(w1,n1,d), f2=toImproper(w2,n2,d);
+    const result=divF(f1,f2);
+    return {text:`${w1}${fracHTML(n1,d)} ÷ ${w2}${fracHTML(n2,d)} = ?`,mcq:buildMCQ(result),
+      hint:`First convert both mixed numbers to improper fractions: ${w1}${fracPlain(f1)?'':''} → ${f1.n}/${f1.d}, and → ${f2.n}/${f2.d}. Then Keep-Change-Flip: ${f1.n}/${f1.d} × ${f2.d}/${f2.n}. Simplify → <b>${fracPlain(result)}</b>.`};
+  }
+}
+function genL11(){
+  const d=ri(2,6);
+  const a=ri(1,d-1), b=ri(1,d-1), c=ri(2,4);
+  const f1={n:a,d}, f2={n:b,d};
+  const type=pick(['addThenMul','mulThenAdd']);
+  let result, text, hint;
+  if(type==='addThenMul'){
+    const inner=addF(f1,f2);
+    result=mulF(inner,{n:c,d:1});
+    text=`(${fracStrForMixed(f1)} + ${fracStrForMixed(f2)}) × ${c} = ?`;
+    hint=`BODMAS: brackets first. ${fracPlain(f1)} + ${fracPlain(f2)} = ${fracPlain(inner)}. Then multiply by ${c}: ${fracPlain(inner)} × ${c} = <b>${fracPlain(result)}</b>.`;
+  } else {
+    const mul=mulF(f1,{n:c,d:1});
+    result=addF(mul,f2);
+    text=`(${fracStrForMixed(f1)} × ${c}) + ${fracStrForMixed(f2)} = ?`;
+    hint=`BODMAS: brackets first. ${fracPlain(f1)} × ${c} = ${fracPlain(mul)}. Then add ${fracPlain(f2)}: ${fracPlain(mul)} + ${fracPlain(f2)} = <b>${fracPlain(result)}</b>.`;
+  }
+  return {text,mcq:buildMCQ(result),hint};
+}
+const WORD_TEMPLATES=[
+  (a,b,c)=>({story:`A jug had ${a}${b.w}${fracHTML(b.n,b.d)} litres of juice. Nan poured in another ${c.n}/${c.d} litre. How many litres are there now?`,f1:b,f2:c,op:'add'}),
+  (a,b,c)=>({story:`A ribbon is ${b.w}${fracHTML(b.n,b.d)} metres long. A piece ${c.n}/${c.d} metres long is cut off. How much ribbon is left?`,f1:b,f2:c,op:'sub'}),
+  (a,b,c)=>({story:`Each box holds ${c.n}/${c.d} kg of rice. How many kilograms are in ${a} boxes?`,f1:{n:a,d:1},f2:c,op:'mul'}),
+  (a,b,c)=>({story:`A rope ${b.w}${fracHTML(b.n,b.d)} metres long is cut into pieces ${c.n}/${c.d} metres each. How many pieces can be cut?`,f1:b,f2:c,op:'div'}),
+];
+function genL12(){
+  const d=ri(2,8);
+  const b={w:ri(1,4),n:ri(1,d-1),d};
+  const c={n:ri(1,d-1),d};
+  const a=ri(2,5);
+  const tmpl=pick(WORD_TEMPLATES)(a,toImproper(b.w,b.n,b.d),c);
+  let result;
+  if(tmpl.op==='add') result=addF(tmpl.f1,tmpl.f2);
+  else if(tmpl.op==='sub') result=cmpF(tmpl.f1,tmpl.f2)>=0? subF(tmpl.f1,tmpl.f2) : subF(tmpl.f2,tmpl.f1);
+  else if(tmpl.op==='mul') result=mulF(tmpl.f1,tmpl.f2);
+  else result=divF(tmpl.f1,tmpl.f2);
+  const opWord={add:'add',sub:'subtract',mul:'multiply',div:'divide'}[tmpl.op];
+  return {text:tmpl.story,mcq:buildMCQ(result),
+    hint:`Read carefully: this problem asks you to <b>${opWord}</b>. Set it up as ${fracPlain(tmpl.f1)} ${{add:'+',sub:'−',mul:'×',div:'÷'}[tmpl.op]} ${fracPlain(tmpl.f2)}, then solve and simplify → <b>${fracPlain(result)}</b>.`};
+}
+const REVIEW_POOL=[genL3,genL4,genL5,genL6,genL7,genL8,genL9,genL10,genL11,genL12];
+function genL13(){ return pick(REVIEW_POOL)(); }
+function genL14(){ return pick(REVIEW_POOL)(); }
+
+/* ============================= STATE & PERSISTENCE ============================= */
+let profile=null;
+let session=null; // current level playthrough state
+let mpState={mode:'arena',room:null,levelId:1,playing:false,pollTimer:null};
+
+const AVATARS=['🦊','🐼','🦄','🐯','🐸','🐧','🦁','🐨','🐙','🦉'];
+const BADGES={
+  1:{name:'Fraction Finder',icon:'🔍'},2:{name:'Order Master',icon:'⚖️'},3:{name:'Add-It-Up',icon:'➕'},
+  4:{name:'LCD Legend',icon:'🧩'},5:{name:'Subtract Star',icon:'➖'},6:{name:'Regroup Ranger',icon:'🔢'},
+  7:{name:'Multiplier',icon:'✖️'},8:{name:'Area Ace',icon:'📐'},9:{name:'KCF Master',icon:'🔄'},
+  10:{name:'Division Duke',icon:'👑'},11:{name:'BODMAS Wizard',icon:'🧙'},12:{name:'Word Problem Whiz',icon:'📖'},
+  13:{name:'Review Champion',icon:'🔁'},14:{name:'Dragon Slayer',icon:'🐉'}
+};
+
+async function loadProfile(){
+  try{
+    const r=await window.storage.get('profile',false);
+    if(r && r.value) return JSON.parse(r.value);
+  }catch(e){}
+  return null;
+}
+async function saveProfile(){
+  try{ await window.storage.set('profile', JSON.stringify(profile), false); }catch(e){console.error(e);}
+}
+function newProfile(name,avatar,section,teacherEmail){
+  return {
+    id:'stu_'+Math.random().toString(36).slice(2,9),
+    name,avatar,section,teacherEmail,
+    xp:0,coins:0,unlocked:1,
+    badges:[],
+    powerups:{fifty:1,hint:2,freeze:1},
+    stats:{}, // levelId -> {stars,best,plays}
+    history:[] // report log
+  };
+}
+
+/* ============================= INIT / LOGIN ============================= */
+const avatarGrid=document.getElementById('avatar-grid');
+let selectedAvatar=AVATARS[0];
+AVATARS.forEach(a=>{
+  const d=document.createElement('div');
+  d.className='avatar-opt'+(a===selectedAvatar?' sel':'');
+  d.textContent=a;
+  d.onclick=()=>{document.querySelectorAll('.avatar-opt').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');selectedAvatar=a;};
+  avatarGrid.appendChild(d);
+});
+
+async function init(){
+  profile=await loadProfile();
+  if(profile){ showMap(); }
+  else { show('screen-login'); }
+}
+document.getElementById('btn-start').onclick=async ()=>{
+  const name=document.getElementById('in-name').value.trim()||'Explorer';
+  const section=document.getElementById('in-section').value;
+  const teacherEmail=document.getElementById('in-teacher').value.trim();
+  profile=newProfile(name,selectedAvatar,section,teacherEmail);
+  await saveProfile();
+  showMap();
+};
+init();
+
+function show(id){
+  ['screen-login','screen-map','screen-game','screen-complete','screen-mp','screen-badges'].forEach(s=>{
+    document.getElementById(s).classList.toggle('hidden', s!==id);
+  });
+}
+
+/* ============================= MAP ============================= */
+function showMap(){
+  show('screen-map');
+  document.getElementById('hud-avatar').textContent=profile.avatar;
+  document.getElementById('hud-name').textContent=profile.name;
+  document.getElementById('hud-sec').textContent=profile.section+' · Fraction Kingdom Explorer';
+  document.getElementById('hud-xp').textContent=profile.xp;
+  document.getElementById('hud-coins').textContent=profile.coins;
+  document.getElementById('hud-badges').textContent=profile.badges.length+'/14';
+  const trail=document.getElementById('trail');
+  trail.innerHTML='';
+  LEVELS.forEach(lv=>{
+    const locked=lv.id>profile.unlocked;
+    const st=profile.stats[lv.id];
+    const done=!!st;
+    const node=document.createElement('div');
+    node.className='node'+(locked?' locked':'')+(done?' done':'')+(lv.boss?' boss':'');
+    node.innerHTML=`
+      <div class="num">${lv.boss?'🐉':(done?'✓':lv.id)}</div>
+      <div class="node-body">
+        <h3>${lv.icon} ${lv.title}</h3>
+        <p>${locked?'Locked — finish the previous quest':`Lesson ${lv.id} of 14`}</p>
+      </div>
+      <div class="node-stars">${done?'⭐'.repeat(st.stars)+'☆'.repeat(3-st.stars):''}</div>
+      <button class="btn small play-btn" ${locked?'disabled':''}>${done?'Replay':'Play'}</button>
+    `;
+    node.querySelector('.play-btn').onclick=()=>{ if(!locked) startLevel(lv.id); };
+    trail.appendChild(node);
+  });
+}
+document.getElementById('btn-badges').onclick=showBadges;
+document.getElementById('btn-badges-back').onclick=showMap;
+function showBadges(){
+  show('screen-badges');
+  const grid=document.getElementById('badges-grid');
+  grid.innerHTML='<div class="row" style="gap:14px;">'+Object.entries(BADGES).map(([id,b])=>{
+    const earned=profile.badges.includes(Number(id));
+    return `<div class="badge-pop" style="width:calc(50% - 7px);opacity:${earned?1:.35}"><div class="ic">${b.icon}</div><div><b>${b.name}</b><br><span style="opacity:.7;font-size:12px;">Lesson ${id}${earned?' · Earned':' · Locked'}</span></div></div>`;
+  }).join('')+'</div>';
+}
+document.getElementById('btn-teacher-panel').onclick=()=>{
+  if(!profile.history.length){ alert('Complete a quest first to generate a report!'); return; }
+  openReportModalFor(profile.history[profile.history.length-1]);
+};
+
+/* ============================= GAMEPLAY ============================= */
+function startLevel(levelId, opts={}){
+  const lv=LEVELS.find(l=>l.id===levelId);
+  const total = lv.boss ? QUESTIONS_PER_BOSS : QUESTIONS_PER_LEVEL;
+  session={
+    level:lv, qIndex:0, total,
+    correct:0, wrong:0, missStreak:0, startTime:Date.now(),
+    mistakeLog:{}, // topic -> count
+    current:null,
+    mpMode: opts.mp || null, // 'arena' | 'boss' | null
+  };
+  show('screen-game');
+  document.getElementById('q-level-name').textContent=(session.mpMode?'⚡ ':'')+lv.title;
+  document.getElementById('timer-wrap').classList.toggle('hidden', !session.mpMode);
+  renderPowerups();
+  nextQuestion();
+}
+document.getElementById('btn-quit').onclick=()=>{ clearInterval(session?.timerInt); if(session&&session.mpMode){ endMpAttempt(); } showMap(); };
+
+function renderPowerups(){
+  document.getElementById('pw-fifty-n').textContent=profile.powerups.fifty;
+  document.getElementById('pw-hint-n').textContent=profile.powerups.hint;
+  document.getElementById('pw-freeze-n').textContent=profile.powerups.freeze;
+  document.getElementById('pw-fifty').disabled=profile.powerups.fifty<=0;
+  document.getElementById('pw-hint').disabled=profile.powerups.hint<=0;
+  document.getElementById('pw-freeze').disabled=profile.powerups.freeze<=0;
+}
+
+function nextQuestion(){
+  if(session.qIndex>=session.total){ return finishLevel(); }
+  session.qIndex++;
+  const q=session.level.gen();
+  session.current=q;
+  session.answered=false;
+  document.getElementById('q-progress-text').textContent=`Q ${session.qIndex}/${session.total}`;
+  document.getElementById('progress-fill').style.width=((session.qIndex-1)/session.total*100)+'%';
+  document.getElementById('hint-box').classList.add('hidden');
+  document.getElementById('feedback-box').classList.add('hidden');
+  document.getElementById('q-text').innerHTML=q.text;
+  const visualEl=document.getElementById('q-visual');
+  if(q.visualHTML){ visualEl.innerHTML=q.visualHTML; visualEl.classList.remove('hidden'); }
+  else { visualEl.classList.add('hidden'); }
+
+  const choicesEl=document.getElementById('q-choices');
+  choicesEl.innerHTML='';
+  let optionData;
+  if(q.mcq){
+    optionData=q.mcq.map(o=>({label:fracPlain(o.val),correct:o.correct,raw:o.val}));
+  } else {
+    optionData=q.textChoices.map(t=>({label:t,correct:t===q.correctText}));
+  }
+  optionData.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='choice-btn';
+    b.innerHTML=opt.label;
+    b.onclick=()=>selectAnswer(b,opt,optionData);
+    choicesEl.appendChild(b);
+  });
+
+  if(session.mpMode){ startQuestionTimer(); }
+}
+
+function startQuestionTimer(){
+  clearInterval(session.timerInt);
+  session.timeLeft=100; session.frozen=false;
+  const fill=document.getElementById('timer-fill');
+  fill.style.width='100%';
+  session.timerInt=setInterval(()=>{
+    if(session.frozen) return;
+    session.timeLeft-=2;
+    fill.style.width=Math.max(0,session.timeLeft)+'%';
+    if(session.timeLeft<=0){ clearInterval(session.timerInt); if(!session.answered) selectAnswer(null,{correct:false},[]); }
+  },200);
+}
+
+function selectAnswer(btnEl,opt,optionData){
+  if(session.answered) return;
+  session.answered=true;
+  clearInterval(session.timerInt);
+  document.querySelectorAll('.choice-btn').forEach(b=>b.classList.add('dimmed'));
+  if(btnEl) btnEl.classList.remove('dimmed');
+  const allBtns=[...document.querySelectorAll('.choice-btn')];
+  allBtns.forEach((b,i)=>{
+    if(optionData[i] && optionData[i].correct) b.classList.add('correct');
+  });
+  if(!opt.correct && btnEl) btnEl.classList.add('wrong');
+
+  const fb=document.getElementById('feedback-box');
+  fb.classList.remove('hidden');
+  if(opt.correct){
+    session.correct++; session.missStreak=0;
+    fb.className='feedback-box ok';
+    fb.innerHTML='🎉 Correct! '+ (session.current.hint?`<br><span style="opacity:.85;">${session.current.hint}</span>`:'');
+    if(session.mpMode==='boss') bumpBoss(1);
+    if(session.correct%3===0 && Math.random()<0.5){ awardPowerupRandom(); }
+  } else {
+    session.wrong++; session.missStreak++;
+    const topic=session.level.title;
+    session.mistakeLog[topic]=(session.mistakeLog[topic]||0)+1;
+    fb.className='feedback-box no';
+    fb.innerHTML='❌ Not quite. <br>'+(session.current.hint||'');
+    if(session.missStreak>=2){
+      document.getElementById('hint-box').classList.remove('hidden');
+      document.getElementById('hint-box').innerHTML='💡 <b>Scaffold:</b> '+(session.current.hint||'Try breaking the problem into smaller steps.');
+    }
+  }
+  if(session.mpMode==='arena'){ pushArenaScore(); }
+
+  setTimeout(()=>{ nextQuestion(); }, session.mpMode?900:1600);
+}
+
+function awardPowerupRandom(){
+  const p=pick(['fifty','hint','freeze']);
+  profile.powerups[p]++; saveProfile(); renderPowerups();
+}
+
+document.getElementById('pw-fifty').onclick=()=>{
+  if(profile.powerups.fifty<=0||session.answered) return;
+  profile.powerups.fifty--; saveProfile(); renderPowerups();
+  const wrongBtns=[...document.querySelectorAll('.choice-btn')].filter(b=>!b.classList.contains('correct'));
+  // find two wrong ones and dim them (correct not marked yet, so pick by comparing to correct answer text)
+  const correctLabel = session.current.mcq ? fracPlain(session.current.mcq.find(o=>o.correct).val) : session.current.correctText;
+  const eligible=[...document.querySelectorAll('.choice-btn')].filter(b=>b.textContent!==correctLabel);
+  shuffle(eligible).slice(0,2).forEach(b=>{b.classList.add('dimmed');b.disabled=true;});
+};
+document.getElementById('pw-hint').onclick=()=>{
+  if(profile.powerups.hint<=0||session.answered) return;
+  profile.powerups.hint--; saveProfile(); renderPowerups();
+  const hb=document.getElementById('hint-box');
+  hb.classList.remove('hidden');
+  hb.innerHTML='💡 <b>Hint Radar:</b> '+(session.current.hint||'Think step by step.');
+};
+document.getElementById('pw-freeze').onclick=()=>{
+  if(profile.powerups.freeze<=0||session.answered||!session.mpMode) return;
+  profile.powerups.freeze--; saveProfile(); renderPowerups();
+  session.frozen=true; setTimeout(()=>{session.frozen=false;},3000);
+};
+
+/* ============================= LEVEL COMPLETE / REPORT ============================= */
+function finishLevel(){
+  const s=session;
+  const accuracy=Math.round((s.correct/s.total)*100);
+  const stars = accuracy>=90?3:accuracy>=70?2:accuracy>=40?1:0;
+  const timeSpent=Math.round((Date.now()-s.startTime)/1000);
+  const xpGain=10*s.correct + (s.level.boss?30:10);
+  const coinGain=Math.round(xpGain/2);
+
+  profile.xp+=xpGain; profile.coins+=coinGain;
+  const prevStars=(profile.stats[s.level.id]||{stars:0}).stars;
+  profile.stats[s.level.id]={stars:Math.max(stars,prevStars),best:accuracy,plays:((profile.stats[s.level.id]||{}).plays||0)+1};
+  let newBadge=null;
+  if(!profile.badges.includes(s.level.id) && accuracy>=70){
+    profile.badges.push(s.level.id); newBadge=BADGES[s.level.id];
+  }
+  if(stars>0 && profile.unlocked===s.level.id && s.level.id<14){ profile.unlocked=s.level.id+1; }
+
+  const report={
+    studentName:profile.name, section:profile.section, level:s.level.title, levelId:s.level.id,
+    date:new Date().toLocaleString(), timeSpentSec:timeSpent,
+    score:s.correct+'/'+s.total, accuracy, mistakes:s.mistakeLog,
+    recommendation: accuracy>=90? 'Mastery achieved — ready for the next lesson.' :
+      accuracy>=70? 'Solid understanding — light review of missed question types recommended.' :
+      accuracy>=40? 'Partial understanding — recommend re-teaching with visual models before progressing.' :
+      'Needs significant support — recommend 1:1 or small-group re-teaching of this lesson before moving on.'
+  };
+  profile.history.push(report);
+  saveProfile();
+
+  if(s.mpMode) endMpAttempt();
+
+  show('screen-complete');
+  document.getElementById('cc-title').textContent = s.level.boss? (stars>0?'🐉 Dragon Defeated!':'The Dragon Escaped...') : 'Quest Complete!';
+  document.getElementById('cc-stars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('cc-summary').innerHTML=`Score <b>${s.correct}/${s.total}</b> (${accuracy}%) · +${xpGain} XP · +${coinGain} 🪙 · ${timeSpent}s`;
+  const bEl=document.getElementById('cc-badge');
+  if(newBadge){ bEl.classList.remove('hidden'); bEl.innerHTML=`<div class="ic">${newBadge.icon}</div><div><b>Badge Unlocked: ${newBadge.name}</b><br><span style="opacity:.7;font-size:12px;">Awarded for ${s.level.title}</span></div>`; }
+  else bEl.classList.add('hidden');
+
+  document.getElementById('cc-report').innerHTML=`
+    <b>📋 Teacher Report Preview</b>
+    <table>
+      <tr><td>Student</td><td>${report.studentName} (${report.section})</td></tr>
+      <tr><td>Level</td><td>${report.level}</td></tr>
+      <tr><td>Score</td><td>${report.score} — ${report.accuracy}%</td></tr>
+      <tr><td>Time spent</td><td>${report.timeSpentSec}s</td></tr>
+      <tr><td>Mistakes by topic</td><td>${Object.entries(report.mistakes).map(([k,v])=>`${k}: ${v}`).join(', ')||'None 🎉'}</td></tr>
+      <tr><td>Suggested action</td><td>${report.recommendation}</td></tr>
+    </table>`;
+  document.getElementById('btn-send-report').onclick=()=>sendReportEmail(report);
+  document.getElementById('btn-download-report').onclick=()=>downloadReportCSV(report);
+}
+document.getElementById('btn-cc-continue').onclick=showMap;
+
+function sendReportEmail(report){
+  const subject=`Fraction Kingdom report: ${report.studentName} — ${report.level}`;
+  const body=
+`Student: ${report.studentName} (${report.section})
+Date: ${report.date}
+Level: ${report.level}
+Score: ${report.score} (${report.accuracy}%)
+Time spent: ${report.timeSpentSec} seconds
+Mistakes by topic: ${Object.entries(report.mistakes).map(([k,v])=>`${k}: ${v}`).join(', ')||'None'}
+Recommended action: ${report.recommendation}
+
+— Sent from Fraction Kingdom`;
+  const to=profile.teacherEmail||'';
+  const url=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href=url;
+}
+function downloadReportCSV(report){
+  const rows=[
+    ['Student','Section','Level','Date','Score','Accuracy%','TimeSpentSec','Mistakes','Recommendation'],
+    [report.studentName,report.section,report.level,report.date,report.score,report.accuracy,report.timeSpentSec,
+      Object.entries(report.mistakes).map(([k,v])=>`${k}:${v}`).join(';')||'None',report.recommendation]
+  ];
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`fraction-kingdom-report-${report.studentName.replace(/\s+/g,'_')}-L${report.levelId}.csv`;
+  a.click();
+}
+function openReportModalFor(report){ sendReportEmail(report); }
+
+/* ============================= MULTIPLAYER (shared storage) ============================= */
+document.getElementById('btn-mp').onclick=()=>{
+  show('screen-mp');
+  document.getElementById('mp-setup').classList.remove('hidden');
+  document.getElementById('mp-live').classList.add('hidden');
+  const sel=document.getElementById('mp-level-select');
+  sel.innerHTML=LEVELS.map(l=>`<option value="${l.id}">${l.id}. ${l.title}</option>`).join('');
+};
+document.getElementById('btn-mp-back').onclick=()=>{ stopPolling(); showMap(); };
+document.getElementById('tab-arena').onclick=()=>setMpTab('arena');
+document.getElementById('tab-boss').onclick=()=>setMpTab('boss');
+function setMpTab(mode){
+  mpState.mode=mode;
+  document.getElementById('tab-arena').classList.toggle('active',mode==='arena');
+  document.getElementById('tab-boss').classList.toggle('active',mode==='boss');
+  document.getElementById('mp-arena-panel').classList.toggle('hidden',mode!=='arena');
+  document.getElementById('mp-boss-panel').classList.toggle('hidden',mode!=='boss');
+}
+document.getElementById('btn-mp-make').onclick=()=>{
+  document.getElementById('in-room').value=profile.section.replace(/[^A-Za-z0-9]/g,'')+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+};
+document.getElementById('btn-mp-join').onclick=async ()=>{
+  const room=document.getElementById('in-room').value.trim();
+  if(!room){ alert('Enter or generate a room code first.'); return; }
+  mpState.room=room;
+  mpState.levelId=Number(document.getElementById('mp-level-select').value);
+  document.getElementById('mp-setup').classList.add('hidden');
+  document.getElementById('mp-live').classList.remove('hidden');
+  document.getElementById('mp-room-label').textContent=room;
+  document.getElementById('mp-room-label2').textContent=room;
+  if(mpState.mode==='boss'){ await ensureBoss(); }
+  startPolling();
+};
+document.getElementById('btn-mp-play').onclick=()=>{
+  startLevel(mpState.levelId,{mp:mpState.mode});
+};
+
+async function pushArenaScore(){
+  if(!mpState.room) return;
+  const key=`arena:${mpState.room}:${profile.id}`;
+  const val={name:profile.name+' '+profile.avatar, score:session.correct, time:Math.round((Date.now()-session.startTime)/1000)};
+  try{ await window.storage.set(key, JSON.stringify(val), true); }catch(e){}
+}
+async function refreshArena(){
+  if(!mpState.room) return;
+  try{
+    const list=await window.storage.list(`arena:${mpState.room}:`, true);
+    if(!list||!list.keys) return;
+    const entries=await Promise.all(list.keys.map(async k=>{
+      try{ const r=await window.storage.get(k,true); return r?JSON.parse(r.value):null; }catch(e){return null;}
+    }));
+    const sorted=entries.filter(Boolean).sort((a,b)=>b.score-a.score || a.time-b.time);
+    const el=document.getElementById('mp-leaderboard');
+    el.innerHTML=sorted.map((e,i)=>`<div class="lb-row"><span class="lb-rank">${i+1}</span><span class="lb-name">${e.name}</span><span class="lb-score">${e.score} pts</span></div>`).join('')||'<p style="opacity:.6;">No scores yet — be the first!</p>';
+  }catch(e){}
+}
+async function ensureBoss(){
+  const key=`boss:${mpState.room}`;
+  try{
+    let r=await window.storage.get(key,true);
+    if(!r){ await window.storage.set(key, JSON.stringify({hp:100,maxHp:100,contrib:{}}), true); }
+  }catch(e){
+    try{ await window.storage.set(key, JSON.stringify({hp:100,maxHp:100,contrib:{}}), true); }catch(e2){}
+  }
+}
+async function bumpBoss(dmg){
+  if(!mpState.room) return;
+  const key=`boss:${mpState.room}`;
+  try{
+    const r=await window.storage.get(key,true);
+    const data=r?JSON.parse(r.value):{hp:100,maxHp:100,contrib:{}};
+    data.hp=Math.max(0,data.hp-dmg*5);
+    data.contrib[profile.name]=(data.contrib[profile.name]||0)+1;
+    await window.storage.set(key, JSON.stringify(data), true);
+  }catch(e){}
+}
+async function refreshBoss(){
+  if(!mpState.room) return;
+  try{
+    const r=await window.storage.get(`boss:${mpState.room}`,true);
+    if(!r) return;
+    const data=JSON.parse(r.value);
+    document.getElementById('boss-hp-fill').style.width=(data.hp/data.maxHp*100)+'%';
+    document.getElementById('boss-hp-text').textContent=`HP ${data.hp}/${data.maxHp}`;
+    const top=Object.entries(data.contrib).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    document.getElementById('boss-contrib').innerHTML=top.map(([n,c])=>`<div class="lb-row"><span class="lb-name">${n}</span><span class="lb-score">${c} hits</span></div>`).join('');
+    if(data.hp<=0){ document.getElementById('boss-hp-text').textContent='🐉 Dragon defeated by the class!'; }
+  }catch(e){}
+}
+function startPolling(){
+  stopPolling();
+  const tick=()=>{ mpState.mode==='arena' ? refreshArena() : refreshBoss(); };
+  tick();
+  mpState.pollTimer=setInterval(tick,2000);
+}
+function stopPolling(){ if(mpState.pollTimer) clearInterval(mpState.pollTimer); mpState.pollTimer=null; }
+function endMpAttempt(){ /* leave scores in place for others to see */ }
+
+</script>
+</body>
+</html>
